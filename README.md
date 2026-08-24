@@ -1,69 +1,150 @@
 <p align="center">
-  <img src="https://raw.githubusercontent.com/Stirling-Tools/Stirling-PDF/main/docs/stirling.png" width="80" alt="Stirling PDF logo">
+  <img src="https://raw.githubusercontent.com/Stirling-Tools/Stirling-PDF/main/docs/stirling.png" width="90" alt="Stirling PDF Logo">
 </p>
 
-<h1 align="center">Stirling PDF - The Open-Source PDF Platform</h1>
-
-Stirling PDF is a powerful, open-source PDF editing platform. Run it as a personal desktop app, in the browser, or deploy it on your own servers with a private API. Edit, sign, redact, convert, and automate PDFs without sending documents to external services.
+<h1 align="center">Stirling PDF — Edição Enterprise Customizada (pt-BR)</h1>
 
 <p align="center">
-  <a href="https://hub.docker.com/r/stirlingtools/stirling-pdf">
-    <img src="https://img.shields.io/docker/pulls/frooodle/s-pdf" alt="Docker Pulls">
-  </a>
-  <a href="https://discord.gg/HYmhKj45pU">
-    <img src="https://img.shields.io/discord/1068636748814483718?label=Discord" alt="Discord">
-  </a>
-  <a href="https://scorecard.dev/viewer/?uri=github.com/Stirling-Tools/Stirling-PDF">
-    <img src="https://api.scorecard.dev/projects/github.com/Stirling-Tools/Stirling-PDF/badge" alt="OpenSSF Scorecard">
-  </a>
-  <a href="https://github.com/Stirling-Tools/stirling-pdf">
-    <img src="https://img.shields.io/github/stars/stirling-tools/stirling-pdf?style=social" alt="GitHub Repo stars">
-  </a>
+  <b>Plataforma completa e robusta de manipulação e edição de PDF, 100% em Português (Brasil), com recursos Enterprise e suporte a banco de dados separado (PostgreSQL).</b>
 </p>
 
-![Stirling PDF - Dashboard](images/home-light.png)
+<p align="center">
+  <img src="https://img.shields.io/badge/Language-pt--BR-green.svg" alt="Idioma pt-BR">
+  <img src="https://img.shields.io/badge/License-Enterprise%20Unlocked-blue.svg" alt="Enterprise Unlocked">
+  <img src="https://img.shields.io/badge/Docker-Ready-2496ED.svg?logo=docker" alt="Docker Ready">
+  <img src="https://img.shields.io/badge/Database-H2%20%7C%20PostgreSQL-orange.svg" alt="Databases">
+</p>
 
-## Key Capabilities
+---
 
-- **Everywhere you work** - Desktop client, browser UI, and self-hosted server with a private API.
-- **50+ PDF tools** - Edit, merge, split, sign, redact, convert, OCR, compress, and more.
-- **Automation & workflows** - No-code pipelines direct in UI with APIs to process millions of PDFs.
-- **Enterprise‑grade** - SSO, auditing, and flexible on‑prem deployments.
-- **Developer platform** - REST APIs available for nearly all tools to integrate into your existing systems.
-- **Global UI** - Interface available in 40+ languages.
+## 🚀 Principais Modificações e Melhorias
 
-For a full feature list, see the docs: **https://docs.stirlingpdf.com**
+1. 🇧🇷 **Tradução Completa para Português (Brasil)**:
+   - **Menu Lateral e Categorias**: *Recomendadas, Assinatura, Segurança de Documentos, Verificação, Revisão, Formatação, Extração, Remoção, Automação, Geral, etc.*
+   - **Painéis de Configurações**: Configurações Gerais, Segurança & Autenticação, Banco de Dados, Auditoria, Licença e Métricas.
+   - **Espaço de Trabalho**: Gestão de Pessoas, Equipes, Convites, Funções e Permissões.
+   - **Visualizador e Ferramentas**: Anotações, Ocultações, Medições, Carimbos, Assinaturas Digitais e Formulários.
 
-## Quick Start
+2. ♾️ **Modo Enterprise com Usuários Ilimitados**:
+   - Recursos Pro/Enterprise liberados nativamente sem restrição de contagem de usuários.
+   - Suporte completo a múltiplos usuários, equipes, controle de permissões por pasta/ferramenta e registro de auditoria.
+
+3. 🔄 **Correção de Reinício Automático no Docker**:
+   - Reinício do servidor direto pela interface web com desligamento gracioso e recuperação automática em containers.
+
+4. 🗄️ **Suporte a Banco de Dados Separado (PostgreSQL)**:
+   - Opção de usar o banco embutido **H2** ou um container dedicado **PostgreSQL** para alta performance e concorrência sem bloqueio de arquivos.
+
+---
+
+## 🛠️ Como Subir e Executar
+
+### Pré-requisitos
+- [Docker](https://docs.docker.com/get-docker/) e [Docker Compose](https://docs.docker.com/compose/) instalados.
+- [Git](https://git-scm.com/) instalado.
+
+---
+
+### Opção 1: Execução com Banco Embutido (H2) — Rápido e Simples
+
+Ideal para testes locais e ambientes menores:
 
 ```bash
-docker run -p 8080:8080 docker.stirlingpdf.com/stirlingtools/stirling-pdf
+# 1. Clone o repositório
+git clone https://github.com/SEU_USUARIO/SEU_REPOSITORIO.git
+cd stirling-pdf
+
+# 2. Suba o container com build local
+docker compose -f docker/compose/docker-compose.yml up -d --build
+
+# 3. Acesse no navegador
+# http://localhost:8088
 ```
 
-Then open: http://localhost:8080
+---
 
-For full installation options (including desktop and Kubernetes), see our [Documentation Guide](https://docs.stirlingpdf.com/#documentation-guide).
+### Opção 2: Execução com Banco Separado (PostgreSQL) — Recomendado para Produção
 
-## Resources
+Ideal para servidores em produção, ambientes multi-usuário e maior estabilidade:
 
-- [**Documentation**](https://docs.stirlingpdf.com)
-- [**Homepage**](https://stirling.com)
-- [**API Docs**](https://registry.scalar.com/@stirlingpdf/apis/stirling-pdf-processing-api/)
-- [**Server Plan & Enterprise**](https://docs.stirlingpdf.com/Paid-Offerings)
+```bash
+# Suba os containers do Stirling PDF + PostgreSQL
+docker compose -f docker/compose/docker-compose.postgres.yml up -d --build
+```
 
-## Support
+- **Aplicação**: `http://localhost:8088`
+- **PostgreSQL**: Porta `5433` (ou interna na rede Docker na porta 5432)
+- **Credenciais do Banco**:
+  - Usuário: `stirling`
+  - Senha: `stirling_secret_password`
+  - Base de dados: `stirling_pdf`
 
-- **Community**: [Discord](https://discord.gg/HYmhKj45pU)
-- **Bug Reports**: [GitHub Issues](https://github.com/Stirling-Tools/Stirling-PDF/issues)
+---
 
-## Contributing
+## ⚙️ Variáveis de Ambiente Importantes
 
-We welcome contributions! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
+Você pode ajustar as variáveis no próprio `docker-compose.yml`:
 
-This project uses [Task](https://taskfile.dev/) as a unified command runner for all build, dev, and test commands. Run `task dev` to get started running the editor, run `task` to see the most common commands, or see the [Developer Guide](DeveloperGuide.md) for full details.
+| Variável | Padrão | Descrição |
+| :--- | :--- | :--- |
+| `SECURITY_ENABLELOGIN` | `true` | Ativa a tela de login e controle de usuários |
+| `SYSTEM_DEFAULTLOCALE` | `pt-BR` | Define o idioma padrão como Português do Brasil |
+| `SYSTEM_MAXFILESIZE` | `500` | Limite máximo de arquivo PDF em MB |
+| `UI_APPNAME` | `Stirling-PDF` | Nome exibido na interface e cabeçalho |
+| `SYSTEM_DATASOURCE_ENABLECUSTOMDATABASE` | `true` | Habilita conexão com banco de dados externo |
+| `SYSTEM_DATASOURCE_CUSTOMDATABASEURL` | `jdbc:postgresql://postgres:5432/stirling_pdf` | URL JDBC para conexão com PostgreSQL |
+| `SYSTEM_DATASOURCE_USERNAME` | `stirling` | Usuário do banco de dados |
+| `SYSTEM_DATASOURCE_PASSWORD` | `stirling_secret_password` | Senha do banco de dados |
 
-For adding translations, see the [Translation Guide](devGuide/HowToAddNewLanguage.md).
+---
 
-## License
+## 🔑 Primeiro Acesso (Administrador)
 
-Stirling PDF is open-core. See [LICENSE](LICENSE) for details.
+- **Usuário Padrão**: `admin`
+- **Senha Padrão**: `stirling`
+- Ao entrar pela primeira vez, acesse **Configurações > Segurança & Autenticação** ou **Espaço de Trabalho > Pessoas** para alterar a senha do administrador ou cadastrar novos membros da sua equipe.
+
+---
+
+## 📋 Comandos Úteis do Dia a Dia
+
+```bash
+# Ver status e logs dos containers
+docker compose -f docker/compose/docker-compose.yml logs -f
+
+# Reiniciar o container
+docker compose -f docker/compose/docker-compose.yml restart
+
+# Parar o serviço
+docker compose -f docker/compose/docker-compose.yml down
+
+# Reconstruir após fazer alterações no código
+docker compose -f docker/compose/docker-compose.yml up -d --build
+```
+
+---
+
+## 📤 Como Subir para o seu GitHub
+
+Para enviar suas alterações para o seu próprio repositório no GitHub:
+
+```bash
+# 1. Adicione todas as alterações
+git add .
+
+# 2. Faça o commit
+git commit -m "feat: traducao pt-BR, usuarios ilimitados, correcao de restart e docker postgres"
+
+# 3. Altere a URL do repositório remoto para o seu GitHub
+git remote set-url origin https://github.com/SEU_USUARIO/SEU_REPOSITORIO.git
+
+# 4. Envie para o GitHub
+git push -u origin main
+```
+
+---
+
+## 🛡️ Licença e Créditos
+
+Baseado no projeto open-source [Stirling-Tools/Stirling-PDF](https://github.com/Stirling-Tools/Stirling-PDF).  
+Distribuído sob os termos da licença do projeto com customizações e melhorias locais.

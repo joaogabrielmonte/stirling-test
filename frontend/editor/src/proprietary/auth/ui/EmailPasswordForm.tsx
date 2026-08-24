@@ -3,6 +3,27 @@ import { Button } from "@app/ui/Button";
 import "@app/auth/ui/auth.css";
 import { TextInput, PasswordInput } from "@mantine/core";
 
+const PersonIcon = () => (
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ opacity: 0.7 }}>
+    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+    <circle cx="12" cy="7" r="4" />
+  </svg>
+);
+
+const LockIcon = () => (
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ opacity: 0.7 }}>
+    <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+    <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+  </svg>
+);
+
+const KeyIcon = () => (
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ opacity: 0.7 }}>
+    <path d="M21 2l-2 2m-1.5 1.5L14 9l-1.5-1.5L11 9l-1.5-1.5L8 9" />
+    <circle cx="7.5" cy="15.5" r="5.5" />
+  </svg>
+);
+
 // Theme-aware auth input colours (the --auth-* vars flip in dark mode via
 // auth-theme.css). Exported so other auth screens (e.g. invite accept) render
 // their Mantine inputs identically to login.
@@ -11,12 +32,21 @@ export const authInputStyles = {
     backgroundColor: "var(--auth-input-bg)",
     color: "var(--auth-input-text)",
     borderColor: "var(--auth-input-border)",
-    "&:focus": {
-      borderColor: "var(--auth-border-focus)",
+    borderRadius: "0.75rem",
+    transition: "all 0.2s ease",
+    "&:focus, &:focus-within": {
+      borderColor: "var(--c-primary)",
+      boxShadow: "0 0 0 3px color-mix(in srgb, var(--c-primary) 18%, transparent)",
     },
   },
   label: {
     color: "var(--auth-label-text)",
+    fontWeight: 500,
+    marginBottom: "0.25rem",
+    fontSize: "0.875rem",
+  },
+  section: {
+    color: "var(--c-text-muted)",
   },
 };
 
@@ -76,6 +106,7 @@ export default function EmailPasswordForm({
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             error={fieldErrors.email}
+            leftSection={<PersonIcon />}
             classNames={{ label: "auth-label" }}
             styles={authInputStyles}
             autoFocus
@@ -93,6 +124,7 @@ export default function EmailPasswordForm({
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               error={fieldErrors.password}
+              leftSection={<LockIcon />}
               classNames={{ label: "auth-label" }}
               styles={authInputStyles}
             />
@@ -116,6 +148,7 @@ export default function EmailPasswordForm({
               maxLength={6}
               minLength={6}
               error={fieldErrors.mfaCode}
+              leftSection={<KeyIcon />}
               classNames={{ label: "auth-label" }}
               styles={authInputStyles}
             />

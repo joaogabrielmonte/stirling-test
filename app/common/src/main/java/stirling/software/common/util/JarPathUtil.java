@@ -52,7 +52,7 @@ public class JarPathUtil {
         Path appJar = currentJar();
 
         // Define possible locations to check (in order of preference)
-        Path[] possibleLocations = new Path[4];
+        Path[] possibleLocations = new Path[5];
 
         // Location 1: Same directory as main JAR (production)
         if (appJar != null) {
@@ -68,6 +68,9 @@ public class JarPathUtil {
 
         // Location 4: Current working directory
         possibleLocations[3] = Path.of("restart-helper.jar").toAbsolutePath();
+
+        // Location 5: Root filesystem (Docker container layout)
+        possibleLocations[4] = Path.of("/restart-helper.jar").toAbsolutePath();
 
         // Check each location
         for (Path location : possibleLocations) {

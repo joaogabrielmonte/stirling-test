@@ -1,8 +1,8 @@
 .auth-fields {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem; /* 8px */
-  margin-bottom: 0.75rem; /* 12px */
+  gap: 0.75rem; /* 12px */
+  margin-bottom: 1.25rem; /* 20px */
 }
 
 /* "or" divider between OAuth buttons and the email form (light-mode auth pages) */
@@ -10,21 +10,26 @@
   display: flex;
   align-items: center;
   gap: 0.75rem; /* 12px */
-  /* Center "or" between the last OAuth button and the input box: the larger top
-     margin balances the field label + input that sit below the smaller bottom
-     margin, so the gap to the button ≈ the gap to the input. */
-  margin: 2.25rem 0 0.75rem; /* 36px top, 12px bottom */
+  margin: 1.75rem 0 1.25rem;
 }
 
 .auth-or-divider__rule {
   height: 0.0625rem; /* 1px */
   flex: 1 1 0%;
-  background-color: rgb(var(--text-divider-rule-rgb-light) / 0.4);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    color-mix(in srgb, var(--c-border) 80%, transparent),
+    transparent
+  );
 }
 
 .auth-or-divider__label {
-  color: rgb(var(--text-divider-label-rgb-light) / 0.4);
+  color: var(--c-text-subtle);
   font-size: 0.75rem; /* 12px */
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
   white-space: nowrap;
 }
 
@@ -43,44 +48,62 @@
 /* Normalize the Mantine inputs used by the login/signup forms so they match the
    OAuth buttons and submit CTA: same height, radius, and font size. */
 .auth-fields .mantine-Input-input {
-  min-height: 2.625rem; /* 42px */
-  height: 2.625rem;
-  border-radius: 0.625rem; /* 10px */
+  min-height: 2.75rem; /* 44px */
+  height: 2.75rem;
+  border-radius: 0.75rem; /* 12px */
   font-size: 0.9375rem; /* 15px */
+  transition: all 0.2s ease;
 }
 
 .auth-input {
   width: 100%;
-  padding: 0.625rem 0.75rem; /* 10px 12px */
+  padding: 0.6875rem 0.875rem;
   border: 1px solid var(--auth-input-border);
-  border-radius: 0.625rem; /* 10px */
+  border-radius: 0.75rem; /* 12px */
   font-size: 0.875rem; /* 14px */
   background-color: var(--auth-input-bg);
   color: var(--auth-input-text);
   outline: none;
+  transition: all 0.2s ease;
 }
 
 .auth-input:focus {
-  border-color: var(--auth-border-focus);
-  box-shadow: 0 0 0 3px var(--auth-focus-ring);
+  border-color: var(--c-primary);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--c-primary) 18%, transparent);
 }
 
+.auth-submit,
 .auth-button {
   width: 100%;
-  padding: 0.625rem 0.75rem; /* 10px 12px */
+  min-height: 2.75rem;
+  padding: 0.6875rem 1rem;
   border: none;
-  border-radius: 0.625rem; /* 10px */
-  background-color: var(--auth-button-bg);
-  color: var(--auth-button-text);
-  font-size: 0.875rem; /* 14px */
+  border-radius: 0.75rem; /* 12px */
+  font-size: 0.9375rem; /* 15px */
   font-weight: 600;
   margin-bottom: 0.75rem; /* 12px */
   cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 4px 14px color-mix(in srgb, var(--c-primary) 28%, transparent);
 }
 
-.auth-button:disabled {
+.auth-submit:hover:not(:disabled),
+.auth-button:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px color-mix(in srgb, var(--c-primary) 40%, transparent);
+}
+
+.auth-submit:active:not(:disabled),
+.auth-button:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.auth-button:disabled,
+.auth-submit:disabled {
   opacity: 0.6;
   cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
 }
 
 .auth-toggle-wrapper {

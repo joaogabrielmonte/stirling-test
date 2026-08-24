@@ -544,6 +544,36 @@ public class AdminSettingsController {
         try {
             log.warn("Admin initiated application restart");
 
+            boolean runningInContainer =
+                    Files.exists(Path.of("/.dockerenv"))
+                            || System.getenv("DOCKER_ENABLE_SECURITY") != null
+                            || System.getenv("CONTAINER") != null;
+
+            // In Docker/container environments, exit the process so the orchestrator/Docker restarts it
+            if (runningInContainer) {
+                log.info("Restart requested in container/Docker environment. Shutting down application context to let container orchestrator restart.");
+                pendingChanges.clear();
+
+                Thread.ofVirtual()
+                        .start(
+                                () -> {
+                                    try {
+                                        Thread.sleep(1000);
+                                        log.info("Shutting down container process for restart...");
+                                        SpringApplication.exit(applicationContext, () -> 0);
+                                        System.exit(0);
+                                    } catch (InterruptedException e) {
+                                        log.error("Restart interrupted: {}", e.getMessage(), e);
+                                        Thread.currentThread().interrupt();
+                                    }
+                                });
+
+                return ResponseEntity.ok(
+                        Map.of(
+                                "message",
+                                "Application restart initiated. The server will be back online shortly."));
+            }
+
             // Get paths to current JAR and restart helper
             Path appJar = JarPathUtil.currentJar();
             Path helperJar = JarPathUtil.restartHelperJar();

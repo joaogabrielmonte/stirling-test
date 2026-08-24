@@ -154,3 +154,49 @@
   justify-content: center;
   padding-inline: 0;
 }
+
+/* ---- Account row & Logout button ---- */
+
+.nav-footer__account-container {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  width: 100%;
+}
+
+.nav-footer__logout-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 2.125rem;
+  height: 2.125rem;
+  padding: 0;
+  border: 0;
+  border-radius: 0.5rem;
+  background: none;
+  color: var(--c-text-subtle);
+  cursor: pointer;
+  transition: all 0.15s ease-in-out;
+}
+
+.nav-footer__logout-btn:hover {
+  background-color: rgba(239, 68, 68, 0.15);
+  color: #ef4444;
+}
+
+.nav-footer__logout-btn:focus-visible {
+  outline: 2px solid #ef4444;
+  outline-offset: -1px;
+}
+
+.nav-footer__logout-row-collapsed {
+  justify-content: center;
+  padding-inline: 0;
+}
+
+.nav-footer__logout-row-collapsed:hover {
+  color: #ef4444 !important;
+  background-color: rgba(239, 68, 68, 0.15) !important;
+}
+

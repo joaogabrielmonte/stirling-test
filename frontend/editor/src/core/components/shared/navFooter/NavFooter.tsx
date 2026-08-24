@@ -1,11 +1,15 @@
-import { useState, type ReactNode } from "react";
+import { useCallback, useState, type ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import { Tooltip } from "@mantine/core";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import SettingsIcon from "@mui/icons-material/Settings";
+import LogoutIcon from "@mui/icons-material/Logout";
 import { Avatar, NavSurface } from "@app/ui";
 import { BrandMark } from "@app/components/shared/BrandMark";
 import { type AppSwitchTarget } from "@app/components/shared/AppSwitch";
+import { useAuth } from "@app/auth/UseSession";
+import { useAppConfig } from "@app/contexts/AppConfigContext";
+import { withBasePath } from "@app/constants/app";
 import {
   NavFooterCreditsRow,
   type NavFooterCredits,
@@ -54,7 +58,7 @@ let hasPlayedEnter = false;
  *   1. caller-contributed rows (the self-hosted link-account CTA)
  *   2. free credits remaining
  *   3. "Open <the other app>"
- *   4. the account row — avatar, name, settings
+ *   4. the account row — avatar, name, settings, logout
  *
  * Purely presentational: each app resolves its own identity, wallet and
  * app-switch access and passes them in, so this file carries no build-specific
@@ -73,13 +77,39 @@ export function NavFooter({
   className,
 }: NavFooterProps) {
   const { t } = useTranslation();
+  const { user, isAnonymous, signOut } = useAuth();
+  const { config } = useAppConfig();
+  const showLogout = Boolean((config?.enableLogin || user) && !isAnonymous);
+
+  const handleLogout = useCallback(
+    async (e: React.MouseEvent) => {
+      e.stopPropagation();
+      e.preventDefault();
+      try {
+        if (typeof window !== "undefined") {
+          window.sessionStorage.setItem(
+            "stirling_sso_auto_login_logged_out",
+            "1",
+          );
+        }
+        await signOut();
+      } catch (error) {
+        console.error("Logout error:", error);
+      } finally {
+        window.location.assign(withBasePath("/login"));
+      }
+    },
+    [signOut],
+  );
+
   const [animate] = useState(() => {
     if (hasPlayedEnter) return false;
     hasPlayedEnter = true;
     return true;
   });
 
-  const settingsLabel = t("fileSidebar.openSettings", "Open settings");
+  const settingsLabel = t("fileSidebar.openSettings", "Configurações");
+  const logoutLabel = t("logOut", "Sair");
   const accountLabel = onOpenSettings
     ? `${displayName} - ${settingsLabel}`
     : displayName;
@@ -147,46 +177,85 @@ export function NavFooter({
   rows.push({
     key: "account",
     node: (
-      <Tooltip
-        label={accountLabel}
-        position="right"
-        withinPortal
-        disabled={!collapsed}
-      >
-        <button
-          type="button"
-          className="nav-footer__row nav-footer__account"
-          // Called with no args: handlers that take optional params (the
-          // processor's openSettings(section?)) must not receive the event.
-          onClick={onOpenSettings ? () => onOpenSettings() : undefined}
-          disabled={!onOpenSettings}
-          data-testid={onOpenSettings ? "config-button" : undefined}
-          data-tour={onOpenSettings ? "config-button" : undefined}
-          aria-label={accountLabel}
+      <div className="nav-footer__account-container">
+        <Tooltip
+          label={accountLabel}
+          position="right"
+          withinPortal
+          disabled={!collapsed}
         >
-          {/* Decorative: the button's own label already names the account, so
-              an alt/label here would just repeat it to a screen reader. */}
-          <span aria-hidden>
-            <Avatar
-              size="sm"
-              name={displayName}
-              src={profilePictureUrl ?? undefined}
-            />
-          </span>
-          {!collapsed && (
-            <span className="nav-footer__row-label sidebar-content-fade">
-              {displayName}
+          <button
+            type="button"
+            className="nav-footer__row nav-footer__account"
+            // Called with no args: handlers that take optional params (the
+            // processor's openSettings(section?)) must not receive the event.
+            onClick={onOpenSettings ? () => onOpenSettings() : undefined}
+            disabled={!onOpenSettings}
+            data-testid={onOpenSettings ? "config-button" : undefined}
+            data-tour={onOpenSettings ? "config-button" : undefined}
+            aria-label={accountLabel}
+          >
+            {/* Decorative: the button's own label already names the account, so
+                an alt/label here would just repeat it to a screen reader. */}
+            <span aria-hidden>
+              <Avatar
+                size="sm"
+                name={displayName}
+                src={profilePictureUrl ?? undefined}
+              />
             </span>
-          )}
-          {onOpenSettings && !collapsed && (
-            <span className="nav-footer__trailing" aria-hidden>
-              <SettingsIcon sx={{ fontSize: "1.1rem" }} />
-            </span>
-          )}
-        </button>
-      </Tooltip>
+            {!collapsed && (
+              <span className="nav-footer__row-label sidebar-content-fade">
+                {displayName}
+              </span>
+            )}
+            {onOpenSettings && !collapsed && (
+              <span
+                className="nav-footer__trailing"
+                aria-hidden
+                title={settingsLabel}
+              >
+                <SettingsIcon sx={{ fontSize: "1.1rem" }} />
+              </span>
+            )}
+          </button>
+        </Tooltip>
+
+        {showLogout && !collapsed && (
+          <Tooltip label={logoutLabel} position="top" withinPortal>
+            <button
+              type="button"
+              className="nav-footer__logout-btn"
+              onClick={handleLogout}
+              aria-label={logoutLabel}
+              title={logoutLabel}
+            >
+              <LogoutIcon sx={{ fontSize: "1.1rem" }} />
+            </button>
+          </Tooltip>
+        )}
+      </div>
     ),
   });
+
+  if (showLogout && collapsed) {
+    rows.push({
+      key: "logout-collapsed",
+      node: (
+        <Tooltip label={logoutLabel} position="right" withinPortal>
+          <button
+            type="button"
+            className="nav-footer__row nav-footer__logout-row-collapsed"
+            onClick={handleLogout}
+            aria-label={logoutLabel}
+            title={logoutLabel}
+          >
+            <LogoutIcon sx={{ fontSize: "1.1rem" }} />
+          </button>
+        </Tooltip>
+      ),
+    });
+  }
 
   return (
     <NavSurface

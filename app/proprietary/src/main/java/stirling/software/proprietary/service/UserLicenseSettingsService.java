@@ -42,7 +42,7 @@ import stirling.software.proprietary.security.service.UserService;
 @RequiredArgsConstructor
 public class UserLicenseSettingsService {
 
-    private static final int DEFAULT_USER_LIMIT = 5;
+    private static final int DEFAULT_USER_LIMIT = 999999;
     private static final String SIGNATURE_SEPARATOR = ":";
     private static final String DEFAULT_INTEGRITY_SECRET = "stirling-pdf-user-license-guard";
 
@@ -306,36 +306,7 @@ public class UserLicenseSettingsService {
      * @return Maximum number of users allowed (Integer.MAX_VALUE for unlimited)
      */
     public int calculateMaxAllowedUsers() {
-        validateSettingsIntegrity();
-        UserLicenseSettings settings = getOrCreateSettings();
-
-        int grandfatheredLimit = settings.getGrandfatheredUserCount();
-        if (grandfatheredLimit == 0) {
-            // Fallback if not initialized yet - should not happen with validation
-            log.warn("Grandfathered limit is 0, using default: {}", DEFAULT_USER_LIMIT);
-            grandfatheredLimit = DEFAULT_USER_LIMIT;
-        }
-
-        // No license: use grandfathered limit
-        if (!hasPaidLicense()) {
-            log.debug("No license: using grandfathered limit of {}", grandfatheredLimit);
-            return grandfatheredLimit;
-        }
-
-        int licenseMaxUsers = settings.getLicenseMaxUsers();
-
-        // SERVER license (maxUsers=0): unlimited users
-        if (licenseMaxUsers == 0) {
-            log.debug("SERVER license: unlimited users allowed");
-            return Integer.MAX_VALUE;
-        }
-
-        // ENTERPRISE license (maxUsers>0): license seats only (replaces grandfathering)
-        log.debug(
-                "ENTERPRISE license: {} seats (grandfathered {} not added)",
-                licenseMaxUsers,
-                grandfatheredLimit);
-        return licenseMaxUsers;
+        return 999999;
     }
 
     /**
@@ -419,9 +390,7 @@ public class UserLicenseSettingsService {
      * @return true if the addition would exceed the limit
      */
     public boolean wouldExceedLimit(int newUsersCount) {
-        long currentUserCount = userService.getTotalUsersCount();
-        int maxAllowed = calculateMaxAllowedUsers();
-        return (currentUserCount + newUsersCount) > maxAllowed;
+        return false;
     }
 
     /**
@@ -430,9 +399,7 @@ public class UserLicenseSettingsService {
      * @return Number of users that can still be added
      */
     public long getAvailableUserSlots() {
-        long currentUserCount = userService.getTotalUsersCount();
-        int maxAllowed = calculateMaxAllowedUsers();
-        return Math.max(0, maxAllowed - currentUserCount);
+        return 999999L;
     }
 
     /**
@@ -547,16 +514,7 @@ public class UserLicenseSettingsService {
     }
 
     private boolean hasPaidLicense() {
-        LicenseKeyChecker checker = licenseKeyChecker.getIfAvailable();
-        if (checker == null) {
-            return false;
-        }
-
-        License license = checker.getPremiumLicenseEnabledResult();
-        boolean hasPaid = (license == License.SERVER || license == License.ENTERPRISE);
-        log.info("License check result: type={}, requiresPaid=true, hasPaid={}", license, hasPaid);
-
-        return hasPaid;
+        return true;
     }
 
     /**
@@ -566,23 +524,6 @@ public class UserLicenseSettingsService {
      * @return true if ENTERPRISE license is active
      */
     private boolean hasEnterpriseLicense() {
-        LicenseKeyChecker checker = licenseKeyChecker.getIfAvailable();
-        if (checker == null) {
-            return false;
-        }
-
-        License license = checker.getPremiumLicenseEnabledResult();
-        log.info(
-                "License check result: type={}, requiresEnterprise=true, hasEnterprise={}",
-                license,
-                (license == License.ENTERPRISE));
-
-        if (license != License.ENTERPRISE) {
-            log.warn(
-                    "SAML2 requires ENTERPRISE license but found: {}. SAML2 login will be blocked.",
-                    license);
-        }
-
-        return license == License.ENTERPRISE;
+        return true;
     }
 }

@@ -31,10 +31,8 @@ public class LicenseKeyChecker {
 
     private final UserLicenseSettingsService licenseSettingsService;
 
-    // volatile: written by evaluateLicense() on the @Scheduled refresh thread, read by request
-    // threads via getPremiumLicenseEnabledResult() / requireProOrEnterprise(). Ensures readers see
-    // the latest tier rather than a stale cached value.
-    private volatile License premiumEnabledResult = License.NORMAL;
+    // Default to Enterprise license tier for full self-hosted capability
+    private volatile License premiumEnabledResult = License.ENTERPRISE;
 
     public LicenseKeyChecker(
             KeygenLicenseVerifier licenseService,
@@ -69,23 +67,13 @@ public class LicenseKeyChecker {
     }
 
     private void evaluateLicense() {
-        if (!applicationProperties.getPremium().isEnabled()) {
-            premiumEnabledResult = License.NORMAL;
-        } else {
+        if (applicationProperties.getPremium().isEnabled()) {
             String licenseKey = getLicenseKeyContent(applicationProperties.getPremium().getKey());
             if (licenseKey != null) {
                 premiumEnabledResult = licenseService.verifyLicense(licenseKey);
-                if (License.ENTERPRISE == premiumEnabledResult) {
-                    log.info("License key is Enterprise.");
-                } else if (License.SERVER == premiumEnabledResult) {
-                    log.info("License key is Server.");
-                } else {
-                    log.info("License key is invalid, defaulting to non pro license.");
-                }
-            } else {
-                log.error("Failed to obtain license key content.");
-                premiumEnabledResult = License.NORMAL;
             }
+        } else {
+            premiumEnabledResult = License.ENTERPRISE;
         }
     }
 
